@@ -1,0 +1,159 @@
+[
+    {
+        "id": "ec792ee961bd4cf7",
+        "type": "ui-chart",
+        "z": "3b533a48ac7e1443",
+        "group": "ea652eb3e17b857e",
+        "name": "Gráfico de Presença",
+        "label": "Presença",
+        "order": 3,
+        "chartType": "pie",
+        "category": "Presença",
+        "categoryType": "str",
+        "xAxisLabel": "",
+        "xAxisProperty": "categoria",
+        "xAxisPropertyType": "property",
+        "xAxisType": "radial",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "valor",
+        "yAxisPropertyType": "property",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "action": "replace",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": "",
+        "removeOlderPoints": "",
+        "colors": [
+            "#22c55e",
+            "#2d3648",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": 6,
+        "className": "",
+        "interpolation": "linear",
+        "x": 560,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ea652eb3e17b857e",
+        "type": "ui-group",
+        "name": "📊 Estatísticas do Dia",
+        "page": "719047fdde8b2523",
+        "width": 12,
+        "height": 6,
+        "order": 2,
+        "showTitle": true,
+        "className": "presenca-group",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "719047fdde8b2523",
+        "type": "ui-page",
+        "name": "Presença dos Alunos",
+        "ui": "08464a8f990ec450",
+        "path": "/painel",
+        "icon": "school",
+        "layout": "grid",
+        "theme": "09c16c6a1d2fb03e",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "12"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "12"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "12"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "08464a8f990ec450",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "09c16c6a1d2fb03e",
+        "type": "ui-theme",
+        "name": "Tema Presença Dark",
+        "colors": {
+            "surface": "#1e2530",
+            "primary": "#22c55e",
+            "bgPage": "#12161f",
+            "groupBg": "#1e2530",
+            "groupOutline": "#2d3648"
+        },
+        "sizes": {
+            "density": "comfortable",
+            "pagePadding": "20px",
+            "groupGap": "16px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "14px"
+        }
+    },
+    {
+        "id": "d940c1f0a88e0877",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
