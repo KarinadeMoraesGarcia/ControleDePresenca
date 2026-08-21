@@ -1,0 +1,600 @@
+[
+    {
+        "id": "ce7d95581325f2ed",
+        "type": "tab",
+        "label": "Controle de Presença",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e979e115305de625",
+        "type": "http in",
+        "z": "ce7d95581325f2ed",
+        "name": "Receber RA",
+        "url": "/presenca",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 180,
+        "wires": [
+            [
+                "ac04cba4e7592718"
+            ]
+        ]
+    },
+    {
+        "id": "ac04cba4e7592718",
+        "type": "function",
+        "z": "ce7d95581325f2ed",
+        "name": "Processar RA",
+        "func": "if (!msg.payload || !msg.payload.ra || isNaN(Number(msg.payload.ra))) {\n    msg.statusCode = 400;\n    msg.payload = { erro: \"RA inválido\" };\n    return [null, msg];\n}\nmsg.ra = Number(msg.payload.ra);\nmsg.topic = \"SELECT * FROM alunos WHERE ra = \" + msg.ra;\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 260,
+        "wires": [
+            [
+                "e636effeb49c1be6"
+            ],
+            [
+                "5583475f48a3bda9"
+            ]
+        ]
+    },
+    {
+        "id": "e636effeb49c1be6",
+        "type": "mysql",
+        "z": "ce7d95581325f2ed",
+        "mydb": "eec0e881d65bd21d",
+        "name": "Buscar Aluno",
+        "x": 550,
+        "y": 180,
+        "wires": [
+            [
+                "19b8e04a9def7fb4"
+            ]
+        ]
+    },
+    {
+        "id": "19b8e04a9def7fb4",
+        "type": "switch",
+        "z": "ce7d95581325f2ed",
+        "name": "Aluno existe?",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "str"
+            },
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 100,
+        "wires": [
+            [
+                "5583475f48a3bda9"
+            ],
+            [
+                "7db2ba4bff44892f"
+            ]
+        ]
+    },
+    {
+        "id": "7db2ba4bff44892f",
+        "type": "function",
+        "z": "ce7d95581325f2ed",
+        "name": "Montar INSERT",
+        "func": "msg.topic = \"INSERT INTO presenca (ra) VALUES (\" + Number(msg.ra) + \")\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 100,
+        "wires": [
+            [
+                "efc1bb00ee84872f"
+            ]
+        ]
+    },
+    {
+        "id": "efc1bb00ee84872f",
+        "type": "mysql",
+        "z": "ce7d95581325f2ed",
+        "mydb": "eec0e881d65bd21d",
+        "name": "Registrar Presença",
+        "x": 1090,
+        "y": 200,
+        "wires": [
+            [
+                "9d39dfb3a88766cb"
+            ]
+        ]
+    },
+    {
+        "id": "9d39dfb3a88766cb",
+        "type": "function",
+        "z": "ce7d95581325f2ed",
+        "name": "Resposta OK",
+        "func": "msg.statusCode = 200;\nmsg.payload = { status: \"ok\", mensagem: \"Presença registrada\", ra: msg.ra };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1200,
+        "y": 100,
+        "wires": [
+            [
+                "e0380130e3e7e699",
+                "a3957c988052c4e5"
+            ]
+        ]
+    },
+    {
+        "id": "a3957c988052c4e5",
+        "type": "function",
+        "z": "ce7d95581325f2ed",
+        "name": "Formatar Linha Tabela",
+        "func": "msg.payload = [{ ra: msg.ra, status: \"ok\", mensagem: \"Presença registrada\" }];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 60,
+        "wires": [
+            [
+                "2c37c012ff18b2d6",
+                "ef3c7c83fa9ad6ec"
+            ]
+        ]
+    },
+    {
+        "id": "5583475f48a3bda9",
+        "type": "function",
+        "z": "ce7d95581325f2ed",
+        "name": "Resposta Erro",
+        "func": "msg.statusCode = msg.statusCode || 404;\nif (msg.statusCode === 400) {\n    msg.payload = { erro: \"RA inválido\" };\n} else {\n    msg.payload = { erro: \"Aluno não encontrado\" };\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 320,
+        "wires": [
+            [
+                "e0380130e3e7e699"
+            ]
+        ]
+    },
+    {
+        "id": "e0380130e3e7e699",
+        "type": "http response",
+        "z": "ce7d95581325f2ed",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1470,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "2c37c012ff18b2d6",
+        "type": "ui-table",
+        "z": "ce7d95581325f2ed",
+        "group": "4cb6507d3981c991",
+        "name": "Presenças Registradas",
+        "label": "Presenças Registradas",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "maxrows": 20,
+        "passthru": false,
+        "autocols": false,
+        "showSearch": true,
+        "deselect": true,
+        "selectionType": "none",
+        "columns": [
+            {
+                "title": "RA do Aluno",
+                "key": "ra",
+                "keyType": "key",
+                "width": ""
+            },
+            {
+                "title": "Status",
+                "key": "status",
+                "keyType": "key",
+                "width": ""
+            },
+            {
+                "title": "Mensagem",
+                "key": "mensagem",
+                "keyType": "key",
+                "width": ""
+            }
+        ],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "append",
+        "className": "presenca-table",
+        "x": 1410,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ef3c7c83fa9ad6ec",
+        "type": "function",
+        "z": "ce7d95581325f2ed",
+        "name": "Montar Query Lista",
+        "func": "msg.topic = \"SELECT a.ra, a.nome, IF(EXISTS (SELECT 1 FROM presenca p WHERE p.ra = a.ra AND DATE(p.datahora) = CURDATE()), 'Presente', 'Ausente') AS status FROM alunos a ORDER BY a.nome\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 560,
+        "wires": [
+            [
+                "61d30debefb36997"
+            ]
+        ]
+    },
+    {
+        "id": "61d30debefb36997",
+        "type": "mysql",
+        "z": "ce7d95581325f2ed",
+        "mydb": "eec0e881d65bd21d",
+        "name": "Buscar Lista Completa",
+        "x": 790,
+        "y": 560,
+        "wires": [
+            [
+                "de8e186da659aa82",
+                "7e7b7396406f7cd7"
+            ]
+        ]
+    },
+    {
+        "id": "7e7b7396406f7cd7",
+        "type": "function",
+        "z": "ce7d95581325f2ed",
+        "name": "Calcular Estatísticas",
+        "func": "const rows = msg.payload || [];\n\nconst total = rows.length;\nconst presentes = rows.filter(r => r.status === 'Presente').length;\nconst ausentes = total > 0 ? (total - presentes) : 0;\n\n// O eCharts lê este array de objetos quando o eixo é Radial\nmsg.payload = [\n    { categoria: \"Presentes\", total: presentes },\n    { categoria: \"Ausentes\", total: ausentes }\n];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 620,
+        "wires": [
+            [
+                "d50cb92441962f6e"
+            ]
+        ]
+    },
+    {
+        "id": "3d6595ddfc87c42e",
+        "type": "ui-button",
+        "z": "ce7d95581325f2ed",
+        "group": "ea652eb3e17b857e",
+        "name": "Atualizar Lista",
+        "label": "🔄 Atualizar Lista",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "refresh",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "x": 320,
+        "y": 560,
+        "wires": [
+            [
+                "ef3c7c83fa9ad6ec"
+            ]
+        ]
+    },
+    {
+        "id": "859e1f3cf9cd99f1",
+        "type": "inject",
+        "z": "ce7d95581325f2ed",
+        "name": "Carregar ao iniciar",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 320,
+        "y": 500,
+        "wires": [
+            [
+                "ef3c7c83fa9ad6ec"
+            ]
+        ]
+    },
+    {
+        "id": "de8e186da659aa82",
+        "type": "ui-table",
+        "z": "ce7d95581325f2ed",
+        "group": "e68f95ef74982305",
+        "name": "Lista de Alunos",
+        "label": "Todos os Alunos",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "maxrows": 50,
+        "passthru": false,
+        "autocols": false,
+        "showSearch": true,
+        "deselect": true,
+        "selectionType": "none",
+        "columns": [
+            {
+                "title": "RA",
+                "key": "ra",
+                "keyType": "key",
+                "width": ""
+            },
+            {
+                "title": "Nome",
+                "key": "nome",
+                "keyType": "key",
+                "width": ""
+            },
+            {
+                "title": "Status",
+                "key": "status",
+                "keyType": "key",
+                "width": ""
+            }
+        ],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "replace",
+        "className": "lista-alunos-table",
+        "x": 1060,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d50cb92441962f6e",
+        "type": "ui-chart",
+        "z": "ce7d95581325f2ed",
+        "group": "ea652eb3e17b857e",
+        "name": "Gráfico de Presença",
+        "label": "Presença",
+        "order": 2,
+        "chartType": "doughnut",
+        "category": "categoria",
+        "categoryType": "property",
+        "xAxisLabel": "",
+        "xAxisProperty": "categoria",
+        "xAxisPropertyType": "property",
+        "xAxisType": "radial",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "total",
+        "yAxisPropertyType": "property",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "action": "replace",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": "",
+        "removeOlderPoints": "",
+        "colors": [
+            "#22c55e",
+            "#cbd5e1",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#030303",
+            "#000000"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 12,
+        "height": 6,
+        "className": "",
+        "interpolation": "linear",
+        "x": 1300,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "eec0e881d65bd21d",
+        "type": "MySQLdatabase",
+        "name": "",
+        "host": "localhost",
+        "port": "3306",
+        "db": "controle_presenca",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "4cb6507d3981c991",
+        "type": "ui-group",
+        "name": "📋 Controle de Presença",
+        "page": "719047fdde8b2523",
+        "width": 12,
+        "height": 6,
+        "order": 1,
+        "showTitle": true,
+        "className": "presenca-group",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "ea652eb3e17b857e",
+        "type": "ui-group",
+        "name": "📊 Estatísticas do Dia",
+        "page": "719047fdde8b2523",
+        "width": 12,
+        "height": 6,
+        "order": 3,
+        "showTitle": true,
+        "className": "presenca-group",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "e68f95ef74982305",
+        "type": "ui-group",
+        "name": "🎓 Lista de Alunos",
+        "page": "719047fdde8b2523",
+        "width": 12,
+        "height": 8,
+        "order": 4,
+        "showTitle": true,
+        "className": "presenca-group",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "719047fdde8b2523",
+        "type": "ui-page",
+        "name": "Presença dos Alunos",
+        "ui": "08464a8f990ec450",
+        "path": "/painel",
+        "icon": "school",
+        "layout": "grid",
+        "theme": "09c16c6a1d2fb03e",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "12"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "12"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "12"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "08464a8f990ec450",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "09c16c6a1d2fb03e",
+        "type": "ui-theme",
+        "name": "Tema Presença Dark",
+        "colors": {
+            "surface": "#1e2530",
+            "primary": "#22c55e",
+            "bgPage": "#12161f",
+            "groupBg": "#1e2530",
+            "groupOutline": "#2d3648"
+        },
+        "sizes": {
+            "density": "comfortable",
+            "pagePadding": "20px",
+            "groupGap": "16px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "14px"
+        }
+    },
+    {
+        "id": "1137f19e7c5ba027",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-mysql": "3.0.0",
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
